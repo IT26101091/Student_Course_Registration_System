@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "username": "admin",
+      "password": "adminpassword",
+      "role": "admin"
+    },
+    {
+      "username": "kamal123",
+      "password": "password123",
+      "role": "student",
+      "studentId": "STU001"
+    }
+  ],
+  "courses": [
+    {
+      "courseId": "CS101",
+      "name": "Object-Oriented Programming",
+      "availableSeats": 2,
+      "waitlist": []
+    },
+    {
+      "courseId": "IS102",
+      "name": "Information Systems",
+      "availableSeats": 0,
+      "waitlist": []
+    }
+  ],
+  "students": [
+    {
+      "studentId": "STU001",
+      "name": "Kamal",
+      "enrolledCourseIds": ["CS101"]
+    }
+  ]
+}
