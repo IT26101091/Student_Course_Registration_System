@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Course Registration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="dashboard-container">
+    <header>
+        <h2>Welcome, <span id="studentIdDisplay">Student</span></h2>
+        <button id="logoutBtn" class="secondary-btn">Logout</button>
+    </header>
+
+    <section class="courses-section">
+        <h3>My Enrolled Courses</h3>
+        <ul id="courseList" class="course-list">
+            <!-- Course items will be injected here by JavaScript -->
+        </ul>
+        <p id="noCoursesMessage" style="display: none;">You are not enrolled in any courses yet.</p>
+    </section>
+</div>
+
+<script>
+    // 1. The Bouncer: Kicks user to login if no ID is stored in the browser
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+    // Display the logged-in student's ID in the header
+    document.getElementById('studentIdDisplay').innerText = userId;
+
+    // 2. Fetch courses from the backend
+    async function loadCourses() {
+        try {
+            // Calls Member 4's GET route to retrieve specific student data
+            const response = await fetch(`/api/student/${userId}/courses`);
+            const courses = await response.json();
+
+            const courseList = document.getElementById('courseList');
+            const noCoursesMessage = document.getElementById('noCoursesMessage');
+
+            courseList.innerHTML = ''; // Clears the loading state
+
+            if (courses.length === 0) {
+                noCoursesMessage.style.display = 'block';
+            } else {
+                noCoursesMessage.style.display = 'none';
+                courses.forEach(course => {
+                    const li = document.createElement('li');
+                    li.className = 'course-item';
+                    li.innerHTML = `
+                            <span><strong>${course.courseId}</strong> - ${course.name}</span>
+                            <button onclick="dropCourse('${course.courseId}')" class="danger-btn">Drop</button>
+                        `;
+                    courseList.appendChild(li);
+                });
+            }
+        } catch (error) {
+            console.error("Error loading courses:", error);
+        }
+    }
+
+    // 3. Drop Course Logic
+    async function dropCourse(courseId) {
+        if (!confirm(`Are you sure you want to drop ${courseId}?`)) return;
+
+        try {
+            // Calls Member 4's POST route to remove the course and free a seat
+            const response = await fetch('/api/course/drop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: userId, courseId: courseId })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                loadCourses(); // Refresh the list instantly to reflect the drop
+            } else {
+                alert(result.message || "Failed to drop course.");
+            }
+        } catch (error) {
+            console.error("Error dropping course:", error);
+            alert("Server error. Ensure the Java backend is running.");
+        }
+    }
+
+    // 4. Logout Logic
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem("userId");
+        localStorage.removeItem("role");
+        window.location.href = "login.html";
+    });
+
+    // Trigger the fetch immediately when the page loads
+    loadCourses();
+</script>
+</body>
+</html>
