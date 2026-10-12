@@ -18,6 +18,9 @@ public class Main {
 
         System.out.println("Server is running! API is live at http://localhost:7070/api/data");
 
+        // Redirects anyone visiting the base URL straight to the login page
+        app.get("/", ctx -> ctx.redirect("/login.html"));
+
         // 1. READ Route (Used to display data)
         app.get("/api/data", ctx -> {
             ctx.json(DatabaseHelper.getAllData());
