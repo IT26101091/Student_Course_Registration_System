@@ -36,9 +36,9 @@ public class Main {
 
             // Tell the frontend if it worked or failed
             if (success) {
-                ctx.status(200).result("Success: Course dropped and seats updated.");
+                ctx.status(200).json("Success: Course dropped and seats updated.");
             } else {
-                ctx.status(400).result("Failed: Could not drop course. Check IDs.");
+                ctx.status(400).json("Failed: Could not drop course. Check IDs.");
             }
         });
 
