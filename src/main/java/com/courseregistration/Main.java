@@ -158,6 +158,7 @@ public class Main {
         public String username;
         public String password;
         public String name;
+        public String role;
     }
 
     public static class AddCourseRequest {
