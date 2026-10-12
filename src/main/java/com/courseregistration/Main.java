@@ -3,6 +3,7 @@ package com.courseregistration;
 import io.javalin.Javalin;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.javalin.http.staticfiles.Location;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,6 +12,8 @@ public class Main {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> it.anyHost());
             });
+            // Add the static files configuration
+            config.staticFiles.add("/public", Location.CLASSPATH);
         }).start(7070);
 
         System.out.println("Server is running! API is live at http://localhost:7070/api/data");
