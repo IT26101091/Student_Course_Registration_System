@@ -2,9 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Course Registration</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="auth-container">
+    <h2>Create Account</h2>
 
+    <form id="signupForm">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="username">Username / Student ID</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="role">Account Type</label>
+            <select id="role" name="role">
+                <option value="student">Student</option>
+                <option value="admin">Administrator</option>
+            </select>
+        </div>
+
+        <button type="submit" class="primary-btn">Sign Up</button>
+        <p id="signupMessage" style="display: none;"></p>
+    </form>
+
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+</div>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const messageText = document.getElementById('signupMessage');
+
+        try {
+            // Calls your Javalin signup route to write to data.json
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, username, password, role })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                messageText.style.color = "green";
+                messageText.innerText = "Account created! Redirecting to login...";
+                messageText.style.display = "block";
+
+                // Send them to the login page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2000);
+            } else {
+                messageText.style.color = "red";
+                messageText.innerText = result.message || "Username already exists.";
+                messageText.style.display = "block";
+            }
+        } catch (error) {
+            console.error("Error signing up:", error);
+            messageText.style.color = "red";
+            messageText.innerText = "Server error. Ensure the Java backend is running.";
+            messageText.style.display = "block";
+        }
+    });
+</script>
 </body>
 </html>
