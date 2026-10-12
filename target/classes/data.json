@@ -16,12 +16,14 @@
     {
       "courseId": "CS101",
       "name": "Object-Oriented Programming",
-      "availableSeats": 2
+      "availableSeats": 2,
+      "waitlist": []
     },
     {
       "courseId": "IS102",
       "name": "Information Systems",
-      "availableSeats": 0
+      "availableSeats": 0,
+      "waitlist": []
     }
   ],
   "students": [

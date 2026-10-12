@@ -142,6 +142,21 @@ public class Main {
             ArrayNode waitlist = WaitlistManager.getWaitlistData(request.courseId);
             ctx.status(200).json(waitlist);
         });
+
+        // 9. STUDENT: Get Enrolled Courses Route
+        app.get("/api/student/{id}/courses", ctx -> {
+            // Extract the target student ID from the URL path (e.g., "STU002")
+            String targetStudentId = ctx.pathParam("id");
+
+            // Ask CourseManager to find this student's courses
+            ArrayNode enrolledCourses = CourseManager.getStudentCourses(targetStudentId);
+
+            if (enrolledCourses != null) {
+                ctx.status(200).json(enrolledCourses);
+            } else {
+                ctx.status(404).json(java.util.Map.of("success", false, "message", "Student not found."));
+            }
+        });
     }
 
     // A tiny helper class just to catch the incoming data from the frontend
