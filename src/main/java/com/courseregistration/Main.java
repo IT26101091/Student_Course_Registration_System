@@ -157,6 +157,25 @@ public class Main {
                 ctx.status(404).json(java.util.Map.of("success", false, "message", "Student not found."));
             }
         });
+
+        // 10. UPDATE: Student Profile Route
+        app.post("/api/student/update", ctx -> {
+            UpdateProfileRequest request = ctx.bodyAsClass(UpdateProfileRequest.class);
+
+            // Optional input validation for password length if they are changing it
+            if (request.password != null && !request.password.isEmpty() && !InputValidator.isValidPassword(request.password)) {
+                ctx.status(400).json(java.util.Map.of("success", false, "message", "Password must be at least 6 characters long."));
+                return;
+            }
+
+            ObjectNode result = AuthManager.updateStudentProfile(request.studentId, request.name, request.password);
+
+            if (result.get("success").asBoolean()) {
+                ctx.status(200).json(result);
+            } else {
+                ctx.status(400).json(result);
+            }
+        });
     }
 
     // A tiny helper class just to catch the incoming data from the frontend
@@ -189,6 +208,12 @@ public class Main {
     // Helper class for Route 8 (Fetching the waitlist array)
     public static class WaitlistRequest {
         public String courseId;
+    }
+
+    public static class UpdateProfileRequest {
+        public String studentId;
+        public String name;
+        public String password;
     }
 
 

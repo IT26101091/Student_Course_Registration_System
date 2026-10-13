@@ -77,4 +77,46 @@ public class AuthManager {
         response.put("studentId", newStudentId);
         return response;
     }
+    // Updates a student's profile details (Name or Password)
+    public static ObjectNode updateStudentProfile(String studentId, String newName, String newPassword) {
+        JsonNode root = DatabaseHelper.getAllData();
+        ArrayNode users = (ArrayNode) root.get("users");
+        ArrayNode students = (ArrayNode) root.get("students");
+        ObjectNode response = DatabaseHelper.mapper.createObjectNode();
+
+        boolean updated = false;
+
+        // Step 1: Update the name in the students database array
+        for (JsonNode student : students) {
+            if (student.get("studentId").asText().equals(studentId)) {
+                if (newName != null && !newName.trim().isEmpty()) {
+                    ((ObjectNode) student).put("name", newName.trim());
+                    updated = true;
+                }
+                break;
+            }
+        }
+
+        // Step 2: Update the password in the users authentication array (if provided)
+        for (JsonNode user : users) {
+            if (user.has("studentId") && user.get("studentId").asText().equals(studentId)) {
+                if (newPassword != null && !newPassword.trim().isEmpty()) {
+                    ((ObjectNode) user).put("password", newPassword);
+                    updated = true;
+                }
+                break;
+            }
+        }
+
+        if (updated) {
+            DatabaseHelper.saveData(root);
+            response.put("success", true);
+            response.put("message", "Profile updated successfully.");
+        } else {
+            response.put("success", false);
+            response.put("message", "Student not found or no changes made.");
+        }
+
+        return response;
+    }
 }
