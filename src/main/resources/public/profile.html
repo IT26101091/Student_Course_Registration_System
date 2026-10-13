@@ -4,57 +4,296 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - Course Registration</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Modern Dashboard Styles */
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header Bar */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 20px 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: #4f46e5;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .role-pill {
+            font-size: 0.8rem;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styling */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            color: #111827;
+        }
+
+        .card-subtitle {
+            margin: 4px 0 0;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .card-body {
+            padding: 20px 24px;
+        }
+
+        /* Course List Items */
+        .course-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+        }
+
+        .course-info {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+
+        .empty-state {
+            color: #6b7280;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 20px 0;
+        }
+    </style>
 </head>
 <body>
+
 <div class="dashboard-container">
-    <header>
-        <h2>Welcome, <span id="studentIdDisplay">Student</span></h2>
-        <button id="logoutBtn" class="secondary-btn">Logout</button>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="user-badge">
+            <div class="avatar" id="avatarIcon">S</div>
+            <div>
+                <h2 style="margin: 0; font-size: 1.25rem;">Welcome, <span id="studentIdDisplay">Student</span></h2>
+                <span class="role-pill">Student Account</span>
+            </div>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
     </header>
 
-    <section class="courses-section">
-        <h3>My Enrolled Courses</h3>
-        <ul id="courseList" class="course-list">
-            <!-- Course items will be injected here by JavaScript -->
-        </ul>
-        <p id="noCoursesMessage" style="display: none;">You are not enrolled in any courses yet.</p>
-    </section>
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+        <!-- Card 1: Enrolled Courses -->
+        <section class="card">
+            <div class="card-header">
+                <h3>My Enrolled Courses</h3>
+            </div>
+            <div class="card-body">
+                <ul id="courseList" class="course-list"></ul>
+                <div id="noCoursesMessage" class="empty-state" style="display: none;">
+                    <p>You are not enrolled in any courses yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Card 2: Account Settings -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Account Settings</h3>
+                <p class="card-subtitle">Update your profile information</p>
+            </div>
+            <div class="card-body">
+                <form id="update-form">
+                    <div class="form-group">
+                        <label for="update-name">Full Name</label>
+                        <input type="text" id="update-name" class="form-input" placeholder="Enter new name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="update-password">New Password</label>
+                        <input type="password" id="update-password" class="form-input" placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </section>
+    </div>
 </div>
 
 <script>
-    // 1. The Bouncer: Kicks user to login if no ID is stored in the browser
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    // 1. Session Bouncer Check
+    const studentId = localStorage.getItem("userId") || localStorage.getItem("studentId");
+    if (!studentId) {
         window.location.href = "login.html";
+    } else {
+        document.getElementById("studentIdDisplay").textContent = studentId;
+        document.getElementById("avatarIcon").textContent = studentId.charAt(0).toUpperCase();
     }
 
-    // Display the logged-in student's ID in the header
-    document.getElementById('studentIdDisplay').innerText = userId;
-
-    // 2. Fetch courses from the backend
+    // 2. Load Enrolled Courses
     async function loadCourses() {
+        const courseList = document.getElementById("courseList");
+        const noCoursesMsg = document.getElementById("noCoursesMessage");
+
         try {
-            // Calls Member 4's GET route to retrieve specific student data
-            const response = await fetch(`/api/student/${userId}/courses`);
+            const response = await fetch(`/api/student/${studentId}/courses`);
             const courses = await response.json();
 
-            const courseList = document.getElementById('courseList');
-            const noCoursesMessage = document.getElementById('noCoursesMessage');
+            courseList.innerHTML = "";
 
-            courseList.innerHTML = ''; // Clears the loading state
-
-            if (courses.length === 0) {
-                noCoursesMessage.style.display = 'block';
+            if (!courses || courses.length === 0) {
+                noCoursesMsg.style.display = "block";
             } else {
-                noCoursesMessage.style.display = 'none';
+                noCoursesMsg.style.display = "none";
                 courses.forEach(course => {
-                    const li = document.createElement('li');
-                    li.className = 'course-item';
+                    const li = document.createElement("li");
+                    li.className = "course-item";
                     li.innerHTML = `
-                            <span><strong>${course.courseId}</strong> - ${course.name}</span>
-                            <button onclick="dropCourse('${course.courseId}')" class="danger-btn">Drop</button>
-                        `;
+                        <span class="course-info"><strong>${course.courseId}</strong> - ${course.courseName}</span>
+                        <button class="btn btn-danger" onclick="dropCourse('${course.courseId}')">Drop</button>
+                    `;
                     courseList.appendChild(li);
                 });
             }
@@ -68,16 +307,15 @@
         if (!confirm(`Are you sure you want to drop ${courseId}?`)) return;
 
         try {
-            // Calls Member 4's POST route to remove the course and free a seat
-            const response = await fetch('/api/course/drop', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentId: userId, courseId: courseId })
+            const response = await fetch("/api/course/drop", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ studentId, courseId })
             });
 
             const result = await response.json();
             if (result.success) {
-                loadCourses(); // Refresh the list instantly to reflect the drop
+                loadCourses();
             } else {
                 alert(result.message || "Failed to drop course.");
             }
@@ -87,15 +325,44 @@
         }
     }
 
-    // 4. Logout Logic
+    // 4. Update Profile Logic
+    document.getElementById('update-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('update-name').value;
+        const password = document.getElementById('update-password').value;
+
+        try {
+            const response = await fetch('/api/student/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId, name, password })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert("Profile updated successfully!");
+                document.getElementById('update-name').value = "";
+                document.getElementById('update-password').value = "";
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (err) {
+            console.error("Update failed:", err);
+            alert("Server error. Could not update profile.");
+        }
+    });
+
+    // 5. Logout Logic
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem("userId");
+        localStorage.removeItem("studentId");
         localStorage.removeItem("role");
         window.location.href = "login.html";
     });
 
-    // Trigger the fetch immediately when the page loads
+    // Initial Load
     loadCourses();
 </script>
+
 </body>
 </html>
