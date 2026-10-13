@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="registration-container">
+    <h2>Register for a Course</h2>
+
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="courseId">Select Course:</label>
+            <!-- The options are now empty. JS will fill them in dynamically. -->
+            <select id="courseId" required>
+                <option value="">Loading courses...</option>
+            </select>
+        </div>
+
+        <button type="submit" class="primary-btn">Register</button>
+        <p id="statusMessage"></p>
+    </form>
+</div>
+
+<script>
+    // 1. Frontend Protection: Kick out unauthenticated users
+    const studentId = localStorage.getItem("userId");
+    if (!studentId) {
+        window.location.href = "login.html";
+    }
+
+    // 2. Fetch courses from the backend and build the dropdown dynamically
+    async function loadCourses() {
+        try {
+            const response = await fetch('/api/courses');
+            const courses = await response.json();
+
+            const courseSelect = document.getElementById('courseId');
+            courseSelect.innerHTML = ''; // Clear the "Loading..." text
+
+            // Loop through the fetched courses and create an <option> for each
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                // Using 'courseId' to match your Tech Lead's data.json exactly
+                option.value = course.courseId;
+                option.textContent = `${course.courseId} - ${course.name}`;
+                courseSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error loading courses:", error);
+            document.getElementById('courseId').innerHTML = '<option value="">Failed to load courses</option>';
+        }
+    }
+
+    // Call the function immediately when the page loads
+    loadCourses();
+
+    // 3. Form Submission Logic for the Queue
+    document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const courseId = document.getElementById('courseId').value;
+        const statusText = document.getElementById('statusMessage');
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: studentId, courseId: courseId })
+            });
+
+            const result = await response.json();
+
+            // Display success or failure message
+            if (result.success) {
+                statusText.style.color = "green";
+                statusText.innerText = result.message;
+            } else {
+                statusText.style.color = "red";
+                statusText.innerText = result.message;
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+</script>
+</body>
+</html>
