@@ -45,7 +45,7 @@
 
         document.getElementById('waitlistBody').innerHTML = '<tr><td colspan="3">Sorting and loading...</td></tr>';
 
-        // මෙතන තමයි වෙනස් කළේ: කෙලින්ම localhost:7070 එකට කෝල් එක යවනවා
+
         fetch('http://localhost:7070/api/waitlist/sort', {
             method: 'POST',
             headers: {
