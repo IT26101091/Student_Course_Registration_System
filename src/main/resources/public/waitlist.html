@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitlist Management - Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .btn { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        .btn:hover { background-color: #218838; }
+    </style>
+    <script>
+        if (localStorage.getItem("role") !== "admin") {
+            alert("Unauthorized Access!");
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+
+<h2>Waitlist Management Dashboard</h2>
+
+<button class="btn" onclick="sortWaitlist()">Sort Waitlist (Oldest First)</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Student ID</th>
+        <th>Course ID</th>
+        <th>Request Timestamp</th>
+    </tr>
+    </thead>
+    <tbody id="waitlistBody">
+    <tr><td colspan="3">Loading waitlist...</td></tr>
+    </tbody>
+</table>
+
+<script>
+    window.onload = function() {
+        fetchWaitlist();
+    };
+
+    function fetchWaitlist() {
+        fetch('/api/waitlist')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('waitlistBody');
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3">No students in the waitlist.</td></tr>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const row = `<tr>
+                            <td>${item.studentId}</td>
+                            <td>${item.courseId}</td>
+                            <td>${item.requestTimestamp}</td>
+                        </tr>`;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(error => console.error('Error fetching waitlist:', error));
+    }
+
+    function sortWaitlist() {
+        fetch('/api/waitlist/sort')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('waitlistBody');
+                tbody.innerHTML = '';
+
+                data.forEach(item => {
+                    const row = `<tr>
+                            <td>${item.studentId}</td>
+                            <td>${item.courseId}</td>
+                            <td>${item.requestTimestamp}</td>
+                        </tr>`;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(error => console.error('Error sorting waitlist:', error));
+    }
+</script>
+
+</body>
+</html>

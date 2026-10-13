@@ -136,6 +136,22 @@ public class Main {
             ArrayNode waitlist = WaitlistManager.getWaitlistData(request.courseId);
             ctx.status(200).json(waitlist);
         });
+        // 9. GET: Fetch waitlist entries for a specific course
+        app.post("/api/waitlist", ctx -> {
+            WaitlistRequest request = ctx.bodyAsClass(WaitlistRequest.class);
+            ArrayNode waitlist = WaitlistManager.getWaitlistData(request.courseId);
+            ctx.status(200).json(waitlist);
+        });
+
+        // 10. GET: Sort waitlist and return for a specific course
+        app.post("/api/waitlist/sort", ctx -> {
+            WaitlistRequest request = ctx.bodyAsClass(WaitlistRequest.class);
+            ArrayNode waitlist = WaitlistManager.getWaitlistData(request.courseId);
+            insertionSort(waitlist);
+            ctx.status(200).json(waitlist);
+        });
+
+
     }
 
     // A tiny helper class just to catch the incoming data from the frontend
@@ -168,6 +184,19 @@ public class Main {
     public static class WaitlistRequest {
         public String courseId;
     }
+    public static void insertionSort(ArrayNode waitlist) {
+        for (int i = 1; i < waitlist.size(); i++) {
+            var key = waitlist.get(i);
+            int j = i - 1;
+
+            while (j >= 0 && waitlist.get(j).get("requestTimestamp").asLong() > key.get("requestTimestamp").asLong()) {
+                waitlist.set(j + 1, waitlist.get(j));
+                j = j - 1;
+            }
+            waitlist.set(j + 1, key);
+        }
+    }
+
 
 
 }
