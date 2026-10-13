@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitlist Management - Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .btn { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background-color: #218838; }
+        .input-box { padding: 10px; border: 1px solid #ccc; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+<h2>Waitlist Management Dashboard</h2>
+
+<input type="text" id="courseIdInput" class="input-box" placeholder="Enter Course ID (e.g. IT1160)">
+<button class="btn" onclick="sortWaitlist()">Sort Waitlist (Oldest First)</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Student ID</th>
+        <th>Course ID</th>
+        <th>Request Timestamp</th>
+    </tr>
+    </thead>
+    <tbody id="waitlistBody">
+    <tr><td colspan="3">Please enter a Course ID and click Sort...</td></tr>
+    </tbody>
+</table>
+
+<script>
+    function sortWaitlist() {
+        const courseIdValue = document.getElementById('courseIdInput').value;
+
+        if (!courseIdValue) {
+            alert("Please enter a valid Course ID!");
+            return;
+        }
+
+        document.getElementById('waitlistBody').innerHTML = '<tr><td colspan="3">Sorting and loading...</td></tr>';
+
+        fetch('/api/waitlist/sort', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ courseId: courseIdValue })
+        })
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('waitlistBody');
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3">No students found in the waitlist for this course.</td></tr>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const row = `<tr>
+                            <td>${item.studentId}</td>
+                            <td>${item.courseId}</td>
+                            <td>${item.requestTimestamp}</td>
+                        </tr>`;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(error => {
+                console.error('Error sorting waitlist:', error);
+                document.getElementById('waitlistBody').innerHTML = '<tr><td colspan="3">Error loading data!</td></tr>';
+            });
+    }
+</script>
+
+</body>
+</html>
