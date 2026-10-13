@@ -4,8 +4,14 @@ import io.javalin.Javalin;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.javalin.http.staticfiles.Location;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Main {
+
+    public static CourseQueue masterQueue = new CourseQueue(100);
+
     public static void main(String[] args) {
 
         Javalin app = Javalin.create(config -> {
@@ -43,21 +49,41 @@ public class Main {
         });
 
         // 3. CREATE Route (Used to register for a course)
-        app.post("/api/course/register", ctx -> {
-            DropRequest request = ctx.bodyAsClass(DropRequest.class);
-            String result = CourseManager.registerCourse(request.studentId, request.courseId);
+        // Initialize the JSON mapper
+        ObjectMapper mapper = new ObjectMapper();
 
-            // Reply to Member 1's frontend based on the new waitlist logic
-            if (result.equals("Success")) {
-                ctx.status(200).result("Success: Registered for course.");
-            } else if (result.equals("Waitlisted")) {
-                ctx.status(200).result("Notice: Course full. Added to waitlist."); // 200 OK because the action succeeded
-            } else if (result.equals("AlreadyOnWaitlist")) {
-                ctx.status(400).result("Failed: Student is already on the waitlist for this course.");
-            } else if (result.equals("AlreadyEnrolled")) {
-                ctx.status(400).result("Failed: Student is already enrolled in this course.");
-            } else {
-                ctx.status(404).result("Failed: Course not found.");
+        // Your specific POST route for student registration
+        app.post("/api/register", ctx -> {
+            try {
+                // Parse the incoming JSON from register.html
+                JsonNode body = mapper.readTree(ctx.body());
+                String studentId = body.get("studentId").asText();
+                String courseId = body.get("courseId").asText();
+
+                // Capture exact time and create the Request object
+                long currentTimestamp = System.currentTimeMillis();
+                Request newRequest = new Request(studentId, courseId, currentTimestamp);
+
+                // Send it to the queue you just built
+                boolean isAdded = masterQueue.enqueue(newRequest);
+
+                // Construct the JSON success/failure message to send back to the frontend
+                ObjectNode response = mapper.createObjectNode();
+                if (isAdded) {
+                    response.put("success", true);
+                    response.put("message", "Added to Queue successfully!");
+                } else {
+                    response.put("success", false);
+                    response.put("message", "Failed: Queue is currently full.");
+                }
+
+                ctx.json(response);
+
+            } catch (Exception e) {
+                ObjectNode errorResponse = mapper.createObjectNode();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Invalid Request format");
+                ctx.status(400).json(errorResponse);
             }
         });
 
@@ -155,6 +181,20 @@ public class Main {
                 ctx.status(200).json(enrolledCourses);
             } else {
                 ctx.status(404).json(java.util.Map.of("success", false, "message", "Student not found."));
+            }
+        });
+
+        app.get("/api/courses", ctx -> {
+            try {
+                java.io.File databaseFile = new java.io.File("data.json");
+                JsonNode rootNode = mapper.readTree(databaseFile);
+                JsonNode coursesNode = rootNode.get("courses");
+
+                ctx.contentType("application/json").json(coursesNode);
+
+            } catch (Exception e) {
+                System.out.println("Error reading database: " + e.getMessage());
+                ctx.status(500).result("[]");
             }
         });
     }

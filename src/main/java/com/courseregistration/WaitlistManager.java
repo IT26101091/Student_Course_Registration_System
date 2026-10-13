@@ -43,7 +43,7 @@ public class WaitlistManager {
                 // ==========================================
                 // HANDOFF: TRIGGER MEMBER 3'S INSERTION SORT
                 // ==========================================
-                WaitlistSorter.sort(waitlist);
+                //WaitlistSorter.sort(waitlist);
 
                 // Save to the database AFTER Member 3's code sorts it
                 DatabaseHelper.saveData(root);
