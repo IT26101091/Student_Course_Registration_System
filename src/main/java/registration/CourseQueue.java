@@ -1,7 +1,7 @@
-package com.courseregistration;
+package registration;
 
 
-    public class CourseQueue {
+public class CourseQueue {
         private Request[] queueArray;
         private int front;
         private int rear;

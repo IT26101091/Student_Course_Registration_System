@@ -1,4 +1,4 @@
-package com.courseregistration;
+package registration;
 
 public class Request {
     private String studentId;
